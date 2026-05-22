@@ -1,0 +1,23 @@
+Adventure
+-Name
+-Description
+-Chat
+--Message
+---Sender
+---Text
+-Characters
+--Name
+--Appearance
+--Stats
+--Skills
+--Equipment
+--Status
+--CurrentLocation > Location
+--Relationships
+---Character > Characters
+---Status > String
+-Locations
+--Name > String
+--Description > String
+--NeighboringLocations > Locations
+-Events

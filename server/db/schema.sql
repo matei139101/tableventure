@@ -1,6 +1,27 @@
-CREATE TABLE IF NOT EXISTS users (
+-- DROPS EVERYTHING FOR DEVELOPMENT PURPOSES!
+DROP TABLE IF EXISTS adventure_messages;
+DROP TABLE IF EXISTS adventures;
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
+  username VARCHAR(100) NOT NULL,
   email VARCHAR(100) UNIQUE NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW()
+  password VARCHAR(255) NOT NULL,
+  superuser BOOLEAN NOT NULL DEFAULT FALSE
 );
+
+CREATE TABLE adventures (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title VARCHAR(100) UNIQUE NOT NULL,
+  description VARCHAR(1000) NOT NULL
+);
+CREATE INDEX ON adventures(user_id);
+
+CREATE TABLE adventure_messages (
+  id SERIAL PRIMARY KEY,
+  adventure_id INT NOT NULL REFERENCES adventures(id) ON DELETE CASCADE,
+  text VARCHAR(1000) NOT NULL
+);
+CREATE INDEX ON adventure_messages(adventure_id);
