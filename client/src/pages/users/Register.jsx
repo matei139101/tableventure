@@ -1,6 +1,10 @@
 import { useState } from "react";
+import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -17,7 +21,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch("http://localhost:8080/api/users/create", {
+    await fetch("http://localhost:8080/api/auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -25,8 +29,26 @@ export default function Register() {
       body: JSON.stringify(form)
     });
 
+    const res = await fetch("http://localhost:8080/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: form.email,
+        password: form.password
+      })
+    });
+
     const data = await res.json();
+
     console.log(data);
+    if (data.token) {
+      setTimeout(() => {
+        login(data.token);
+        navigate("/");
+      }, 1);
+    }
   };
 
   return (

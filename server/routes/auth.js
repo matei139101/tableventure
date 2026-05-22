@@ -65,4 +65,32 @@ router.post('/login', async (req, res) => {
   }
 });
 
+/**
+ * @route POST /api/auth/register
+ * @desc Register user
+ * @access Public
+ *
+ * @param(string) req.body.username - The user's username
+ * @param(string) req.body.email - The user's email
+ * @param(string) req.body.password - The user's password
+ *
+ * @returns {Object} 500 - Error message
+ */
+router.post('/register', async (req, res) => {
+  const { username, email, password } = req.body;
+  const hash = await bcrypt.hash(password, 10);
+
+  try {
+    await db.query(
+      'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *',
+      [username, email, hash]
+    );
+    res.status(200)
+  } catch (err) {
+    res.status(500).json({
+      error: err.message
+    });
+  }
+});
+
 export default router;
