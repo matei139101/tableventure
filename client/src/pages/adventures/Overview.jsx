@@ -1,9 +1,10 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from '@/context/AuthContext';
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Overview() {
+  const navigate = useNavigate();
   const { loading, user, token } = useAuth();
   const [adventures, setAdventures] = useState([{
     id: "",
@@ -51,7 +52,7 @@ export default function Overview() {
           <h1>Adventures</h1>
 
           {adventures.map(adventure => (
-            <div key={adventure.id}>
+            <div key={adventure.id} onClick={() => navigate(`/play/${adventure.id}`)}>
               <h2>{adventure.title}</h2>
               <p>{adventure.description}</p>
             </div>

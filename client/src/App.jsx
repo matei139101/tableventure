@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 
 import Overview from './pages/adventures/Overview';
 import Create from './pages/adventures/Create';
+import Play from './pages/adventures/Play';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
 
         <Route path="/adventures/" element={<Overview />} />
         <Route path="/adventures/create" element={<Create />} />
+        <Route path="/play/:id" element={<Play />} />
       </Routes>
     </>
   );
