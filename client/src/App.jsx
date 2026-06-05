@@ -5,6 +5,9 @@ import Register from './pages/users/Register';
 import Dashboard from '@/pages/users/Dashboard';
 import Navbar from './components/Navbar';
 
+import Overview from './pages/adventures/Overview';
+import Create from './pages/adventures/Create';
+
 export default function App() {
   return (
     <>
@@ -12,9 +15,13 @@ export default function App() {
 
       <Routes>
         <Route path="/" element={<Home />} />
+
         <Route path="/user/login" element={<Login />} />
         <Route path="/user/register" element={<Register />} />
         <Route path="/user/dashboard" element={<Dashboard />} />
+
+        <Route path="/adventures/" element={<Overview />} />
+        <Route path="/adventures/create" element={<Create />} />
       </Routes>
     </>
   );

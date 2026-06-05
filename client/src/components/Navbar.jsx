@@ -8,6 +8,7 @@ export default function Navbar() {
     <nav style={styles.nav}>
       <div style={styles.left}>
         <Link to="/" style={styles.link}>Tableventure</Link>
+        <Link to="/adventures/" style={styles.link}>Adventures</Link>
       </div>
 
       <div style={styles.right}>
@@ -43,6 +44,7 @@ const styles = {
     gap: "10px"
   },
   link: {
+    padding: "10px",
     textDecoration: "none",
     color: "black"
   }

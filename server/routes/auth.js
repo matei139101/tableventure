@@ -52,11 +52,6 @@ router.post('/login', async (req, res) => {
 
     res.status(200).json({
       token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email
-      }
     });
   } catch (err) {
     res.status(500).json({
@@ -92,5 +87,30 @@ router.post('/register', async (req, res) => {
     });
   }
 });
+
+/**
+ * @middleware requireAuth
+ * @desc Verifies JWT token from Authorization header and attaches user to req.user
+ * 
+ * @param {string} req.headers.authorization - Bearer token in format "Bearer <token>"
+ * 
+ * @sets {Object} req.user - The decoded user object from the token
+ * @sets {number} req.user.id - The user's ID
+ * @sets {string} req.user.email - The user's email
+ * @sets {string} req.user.username - The user's username
+ * 
+ * @returns {Object} 401 - If token is missing or invalid
+ */
+export function requireAuth(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch {
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+}
 
 export default router;

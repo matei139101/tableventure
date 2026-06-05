@@ -1,22 +1,22 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from '@/context/AuthContext';
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
-export default function Dashboard() {
-  const { loading, token, user } = useAuth();
-  const [userInfo, setUserInfo] = useState({
+export default function Overview() {
+  const { loading, user, token } = useAuth();
+  const [adventures, setAdventures] = useState([{
     id: "",
-    username: "",
-    email: "",
-    superuser: false
-  });
+    title: "",
+    description: ""
+  }]);
 
   useEffect(() => {
     if (!user || !token) return;
 
     const fetchUser = async () => {
       try {
-        const response = await fetch("/api/users/get", {
+        const response = await fetch("/api/adventures/get", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -27,7 +27,7 @@ export default function Dashboard() {
         }
 
         const data = await response.json();
-        setUserInfo(data);
+        setAdventures(data);
       } catch (err) {
         return <h1>An unexpected error has occured</h1>
       }
@@ -46,10 +46,24 @@ export default function Dashboard() {
 
   return (
     <>
-      <h1>ID: {userInfo.id}</h1>
-      <h2>Username: {userInfo.username}</h2>
-      <h2>Email: {userInfo.email}</h2>
-      <h2>Admin: {userInfo.superuser ? "Yes" : "No"}</h2>
+      {adventures.length > 0 ? (
+        <>
+          <h1>Adventures</h1>
+
+          {adventures.map(adventure => (
+            <div key={adventure.id}>
+              <h2>{adventure.title}</h2>
+              <p>{adventure.description}</p>
+            </div>
+          ))}
+        </>
+      ) : (
+        <>
+          <h1>No adventures</h1>
+          <h2>Start an adventure!</h2>
+          <Link to="/adventures/create">Start!</Link>
+        </>
+      )}
     </>
   );
 }
