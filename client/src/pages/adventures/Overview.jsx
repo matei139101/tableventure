@@ -12,29 +12,35 @@ export default function Overview() {
     description: ""
   }]);
 
+  const getAventures = async () => {
+    try {
+      const response = await fetch("/api/adventures/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user");
+      }
+
+      const data = await response.json();
+      setAdventures(data);
+    } catch (err) {
+      return <h1>An unexpected error has occured</h1>
+    }
+  }
+
+  const deleteAdventure = async (e, id) => {
+    e.stopPropagation();
+    await fetch(`/api/adventures/${id}`, { headers: { Authorization: `Bearer ${token}` }, method: 'DELETE' });
+    getAventures();
+  };
+
   useEffect(() => {
     if (!user || !token) return;
 
-    const fetchUser = async () => {
-      try {
-        const response = await fetch("/api/adventures/get", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch user");
-        }
-
-        const data = await response.json();
-        setAdventures(data);
-      } catch (err) {
-        return <h1>An unexpected error has occured</h1>
-      }
-    };
-
-    fetchUser();
+    getAventures();
   }, [user, token]);
 
   if (loading) {
@@ -49,12 +55,14 @@ export default function Overview() {
     <>
       {adventures.length > 0 ? (
         <>
+          <Link to="/adventures/create">Start new adventure!</Link>
           <h1>Adventures</h1>
 
           {adventures.map(adventure => (
             <div key={adventure.id} onClick={() => navigate(`/play/${adventure.id}`)}>
               <h2>{adventure.title}</h2>
               <p>{adventure.description}</p>
+              <h1 onClick={(e) => deleteAdventure(e, adventure.id)}>Delete!</h1>
             </div>
           ))}
         </>

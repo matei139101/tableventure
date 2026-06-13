@@ -29,7 +29,7 @@ export default function Create() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch("http://localhost:8080/api/adventures/create", {
+    const res = await fetch("http://localhost:8080/api/adventures/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
