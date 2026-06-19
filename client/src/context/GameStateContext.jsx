@@ -6,7 +6,6 @@ const GameStateContext = createContext(null);
 export function GameStateProvider({ adventureId, children }) {
   const { loading, token, user } = useAuth();
   const [messages, setMessages] = useState([]);
-
   useEffect(() => {
     if (!token) return;
     fetchMessages();
@@ -19,12 +18,15 @@ export function GameStateProvider({ adventureId, children }) {
       });
       const data = await response.json();
       setMessages(data);
+      return data;
     } catch (err) {
       console.error(err);
     }
   };
 
-  const sendMessage = async (message, sender) => {
+  const saveMessage = async (message, sender) => {
+    console.log(`Saving ${sender} message: ${message}`);
+
     await fetch(`/api/adventures/messages/${adventureId}`, {
       method: "POST",
       headers: {
@@ -34,14 +36,24 @@ export function GameStateProvider({ adventureId, children }) {
       body: JSON.stringify({ text: message, sender: sender }),
     });
 
-    await fetchMessages();
+    return await fetchMessages();
   };
 
-  const sendTurn = async (message) => {
-    await sendMessage(message, "Player");
-
-    const formattedMessages = [...messages, { sender: "Player", text: message }]
+  const compileContext = (messages) => {
+    const formattedMessages = [...messages]
       .map(m => ({ sender: m.sender, text: m.text }));
+
+    return formattedMessages
+  }
+
+  const sendTurn = async (message) => {
+    let turnMessages = messages;
+    if (message) {
+      turnMessages = await saveMessage(message, "Player");
+    }
+
+    const context = compileContext(turnMessages);
+    console.log('Context:', context);
 
     const response = await fetch('/api/gamestate/', {
       method: "POST",
@@ -49,16 +61,19 @@ export function GameStateProvider({ adventureId, children }) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({ messages: formattedMessages }),
+      body: JSON.stringify({ messages: context }),
     });
     const data = await response.json();
 
-    await sendMessage(data.reply, "Narrator");
+    await saveMessage(data.reply, "Narrator");
   };
 
   const undoMessage = async () => {
     if (messages.length > 0) {
       const message_id = messages.at(-1).id;
+
+      console.log(`Removing message with ID: ${message_id}`);
+
       await fetch(`/api/adventures/messages/${message_id}`, {
         method: "DELETE",
         headers: {
