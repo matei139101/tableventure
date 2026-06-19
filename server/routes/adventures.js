@@ -23,6 +23,30 @@ router.get('/', requireAuth, async (req, res) => {
 });
 
 /*
+ * @route GET /api/adventures/:id
+ * @desc Returns data associated to an adventure linked to the authenticated user
+ * @access Private
+ *
+ * @param {string} req.headers.authorization - Bearer token
+ * @param {string} req.params.id - Adventure ID
+ *
+ * @returns {Object} 200 - Adventure information
+ * @returns {Object} 500 - Error message
+ */
+router.get('/:id', requireAuth, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await db.query(
+      'SELECT * FROM adventures WHERE id = $1 AND user_id = $2',
+      [id, req.user.id]
+    );
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/*
  * @route POST /api/adventures/
  * @desc Creates an adventure linked to the authenticated user
  * @access Private
@@ -40,6 +64,32 @@ router.post('/', requireAuth, async (req, res) => {
   try {
     const result = await db.query('INSERT INTO adventures (title, description, user_id) VALUES ($1, $2, $3) RETURNING id', [title, description, req.user.id]);
     res.status(201).json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/*
+ * @route PUT /api/adventures/
+ * @desc Edits an adventure linked to the authenticated user
+ * @access Private
+ *
+ * @param {string} req.headers.authorization - Bearer token
+ * @param {string} req.params.id - Adventure ID
+ * @param {string} req.body.title - Adventure title
+ * @param {string} req.body.description - Adventure description
+ *
+ * @returns {Object} 200 - Adventure edited
+ * @returns {Object} 500 - Error message
+ */
+router.put('/:id', requireAuth, async (req, res) => {
+  const { title, description } = req.body;
+  const { id } = req.params;
+  try {
+    const result = await db.query(
+      'UPDATE adventures SET title = $1, description = $2 WHERE id = $3 AND user_id = $4 RETURNING id', [title, description, id, req.user.id]
+    );
+    res.status(200).json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -103,10 +153,10 @@ router.get('/messages/:id', requireAuth, async (req, res) => {
  */
 router.post('/messages/:id', requireAuth, async (req, res) => {
   const { id } = req.params
-  const { text } = req.body;
+  const { text, sender } = req.body;
 
   try {
-    await db.query('INSERT INTO adventure_messages (adventure_id, text) VALUES ($1, $2)', [id, text]);
+    await db.query('INSERT INTO adventure_messages (adventure_id, text, sender) VALUES ($1, $2, $3)', [id, text, sender]);
     res.status(201).json({ message: "Message created" });
   } catch (err) {
     res.status(500).json({ error: err.message });

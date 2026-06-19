@@ -37,6 +37,11 @@ export default function Overview() {
     getAventures();
   };
 
+  const editAdventure = async (e, id) => {
+    e.stopPropagation();
+    navigate(`/adventures/edit/${id}`);
+  }
+
   useEffect(() => {
     if (!user || !token) return;
 
@@ -62,6 +67,7 @@ export default function Overview() {
             <div key={adventure.id} onClick={() => navigate(`/play/${adventure.id}`)}>
               <h2>{adventure.title}</h2>
               <p>{adventure.description}</p>
+              <h1 onClick={(e) => editAdventure(e, adventure.id)}>Edit!</h1>
               <h1 onClick={(e) => deleteAdventure(e, adventure.id)}>Delete!</h1>
             </div>
           ))}
