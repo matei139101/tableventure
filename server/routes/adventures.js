@@ -59,10 +59,10 @@ router.get('/:id', requireAuth, async (req, res) => {
  * @returns {Object} 500 - Error message
  */
 router.post('/', requireAuth, async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, context } = req.body;
 
   try {
-    const result = await db.query('INSERT INTO adventures (title, description, user_id) VALUES ($1, $2, $3) RETURNING id', [title, description, req.user.id]);
+    const result = await db.query('INSERT INTO adventures (title, description, context, user_id) VALUES ($1, $2, $3, $4) RETURNING id', [title, description, context, req.user.id]);
     res.status(201).json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -78,16 +78,17 @@ router.post('/', requireAuth, async (req, res) => {
  * @param {string} req.params.id - Adventure ID
  * @param {string} req.body.title - Adventure title
  * @param {string} req.body.description - Adventure description
+ * @param {string} req.body.context - Adventure context
  *
  * @returns {Object} 200 - Adventure edited
  * @returns {Object} 500 - Error message
  */
 router.put('/:id', requireAuth, async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, context } = req.body;
   const { id } = req.params;
   try {
     const result = await db.query(
-      'UPDATE adventures SET title = $1, description = $2 WHERE id = $3 AND user_id = $4 RETURNING id', [title, description, id, req.user.id]
+      'UPDATE adventures SET title = $1, description = $2, context = $3 WHERE id = $4 AND user_id = $5 RETURNING id', [title, description, context, id, req.user.id]
     );
     res.status(200).json(result.rows[0]);
   } catch (err) {

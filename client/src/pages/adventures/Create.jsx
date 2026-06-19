@@ -8,7 +8,8 @@ export default function Create() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     title: "",
-    description: ""
+    description: "",
+    context: "",
   });
 
   if (loading) {
@@ -37,7 +38,8 @@ export default function Create() {
       },
       body: JSON.stringify({
         title: form.title,
-        description: form.description
+        description: form.description,
+        context: form.context,
       }),
     });
 
@@ -60,6 +62,12 @@ export default function Create() {
         <input
           name="description"
           placeholder="Description"
+          onChange={handleChange}
+        />
+
+        <input
+          name="context"
+          placeholder="Context"
           onChange={handleChange}
         />
 

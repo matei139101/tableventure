@@ -9,7 +9,8 @@ export default function Edit() {
 
   const [form, setForm] = useState({
     title: "",
-    description: ""
+    description: "",
+    context: "",
   });
   const [fetching, setFetching] = useState(true);
 
@@ -26,7 +27,8 @@ export default function Edit() {
         const data = await res.json();
         setForm({
           title: data.title,
-          description: data.description
+          description: data.description,
+          context: data.context,
         });
       }
       setFetching(false);
@@ -60,7 +62,8 @@ export default function Edit() {
       },
       body: JSON.stringify({
         title: form.title,
-        description: form.description
+        description: form.description,
+        context: form.context,
       }),
     });
     if (res.ok) {
@@ -82,6 +85,12 @@ export default function Edit() {
           name="description"
           placeholder="Description"
           value={form.description}
+          onChange={handleChange}
+        />
+        <input
+          name="context"
+          placeholder="Context"
+          value={form.context}
           onChange={handleChange}
         />
         <button type="submit">Save</button>

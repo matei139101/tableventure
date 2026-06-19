@@ -4,11 +4,13 @@ import { useAuth } from '@/context/AuthContext';
 const GameStateContext = createContext(null);
 
 export function GameStateProvider({ adventureId, children }) {
-  const { loading, token, user } = useAuth();
+  const { loading, token } = useAuth();
   const [messages, setMessages] = useState([]);
+  const [adventure, setAdventure] = useState();
   useEffect(() => {
     if (!token) return;
     fetchMessages();
+    fetchAdventure();
   }, [adventureId, token]);
 
   const fetchMessages = async () => {
@@ -23,6 +25,20 @@ export function GameStateProvider({ adventureId, children }) {
       console.error(err);
     }
   };
+
+  const fetchAdventure = async () => {
+    try {
+      const response = await fetch(`/api/adventures/${adventureId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+      });
+      const data = await response.json();
+      setAdventure(data)
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   const saveMessage = async (message, sender) => {
     console.log(`Saving ${sender} message: ${message}`);
@@ -43,7 +59,9 @@ export function GameStateProvider({ adventureId, children }) {
     const formattedMessages = [...messages]
       .map(m => ({ sender: m.sender, text: m.text }));
 
-    return formattedMessages
+    const context = { context: adventure.context, messages: formattedMessages };
+    console.log("Turn context:", context);
+    return context
   }
 
   const sendTurn = async (message) => {
@@ -52,16 +70,13 @@ export function GameStateProvider({ adventureId, children }) {
       turnMessages = await saveMessage(message, "Player");
     }
 
-    const context = compileContext(turnMessages);
-    console.log('Context:', context);
-
     const response = await fetch('/api/gamestate/', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({ messages: context }),
+      body: JSON.stringify(compileContext(turnMessages)),
     });
     const data = await response.json();
 
