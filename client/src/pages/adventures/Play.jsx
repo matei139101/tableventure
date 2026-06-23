@@ -22,7 +22,8 @@ function PlayContent() {
 
   const handleSend = () => {
     const input = document.getElementById('message-input');
-    sendTurn(input.value);
+    const message = input.value;
+    sendTurn(message);
     input.value = "";
   };
 

@@ -133,7 +133,7 @@ router.get('/messages/:id', requireAuth, async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await db.query('SELECT * FROM adventure_messages WHERE adventure_id = $1', [id]);
+    const result = await db.query('SELECT * FROM adventure_messages WHERE adventure_id = $1 ORDER BY created_at ASC', [id]);
     res.status(200).json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
